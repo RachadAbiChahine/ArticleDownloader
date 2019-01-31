@@ -1,18 +1,20 @@
 import json
 import logging
+import sys
 from newspaper import Article
 
 separator = "*********************************************************************" + '\n'
 
-filename = 'articleUri.txt'
+filename = sys.argv[1]
 file = open(filename, "r")
-output = open("result-Fr", "w")
+output = open(sys.argv[2], "w")
 cmpUrlWellProcessed = 0
 cmpUriInError = 0
 uriInError = []
 for line in file:
     if line.strip().endswith(".pdf"):
-        print("ispdf")
+        logging.error("pdf scanning is impossible")
+        uriInError.append(line)
     else:
         try:
             article = Article(line.strip())
@@ -20,7 +22,7 @@ for line in file:
             article.parse()
             article.nlp()
 
-            output.write(line + '\n')
+            output.write("Url : "+line + '\n')
             output.write(article.title + '\n')
             try:
                 output.write(article.publish_date.strftime("%Y-%m-%d %H:%M:%S") + '\n')
