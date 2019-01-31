@@ -1,8 +1,12 @@
 import json
 import logging
 import sys
+import nltk
+
 from newspaper import Article
 
+
+nltk.download('punkt')
 separator = "*********************************************************************" + '\n'
 
 filename = sys.argv[1]
