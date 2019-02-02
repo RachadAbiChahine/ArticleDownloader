@@ -2,11 +2,28 @@ import json
 import logging
 import sys
 import nltk
+import PyPDF2
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+from urllib.request import urlopen
+from tika import parser
+
+
 
 from newspaper import Article
+import ssl
 
+try:
+    _create_unverified_https_context = ssl._create_unverified_context
+except AttributeError:
+    pass
+else:
+    ssl._create_default_https_context = _create_unverified_https_context
+try:
+    nltk.data.find('tokenizers/punkt')
+except LookupError:
+    nltk.download('punkt')
 
-nltk.download('punkt')
 separator = "*********************************************************************" + '\n'
 
 filename = sys.argv[1]
@@ -17,8 +34,14 @@ cmpUriInError = 0
 uriInError = []
 for line in file:
     if line.strip().endswith(".pdf"):
-        logging.error("pdf scanning is impossible")
-        uriInError.append(line)
+        pdf = urlopen(line.strip()).read()
+        pdfFile = open("tmp.pdf", 'wb')
+        pdfFile.write(pdf)
+        pdfFile.close()
+        raw = parser.from_file("tmp.pdf")
+
+        output.write(separator+raw['content']+separator)
+
     else:
         try:
             article = Article(line.strip())
@@ -26,7 +49,7 @@ for line in file:
             article.parse()
             article.nlp()
 
-            output.write("Url : "+line + '\n')
+            output.write("Url : " + line + '\n')
             output.write(article.title + '\n')
             try:
                 output.write(article.publish_date.strftime("%Y-%m-%d %H:%M:%S") + '\n')
