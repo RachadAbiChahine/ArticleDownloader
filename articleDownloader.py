@@ -2,16 +2,11 @@ import json
 import logging
 import sys
 import nltk
-import PyPDF2
-from nltk.tokenize import word_tokenize
-from nltk.corpus import stopwords
+import ssl
+
 from urllib.request import urlopen
 from tika import parser
-
-
-
 from newspaper import Article
-import ssl
 
 try:
     _create_unverified_https_context = ssl._create_unverified_context
@@ -40,7 +35,7 @@ for line in file:
         pdfFile.close()
         raw = parser.from_file("tmp.pdf")
 
-        output.write(separator+raw['content']+separator)
+        output.write(separator + raw['content'] + separator)
 
     else:
         try:
